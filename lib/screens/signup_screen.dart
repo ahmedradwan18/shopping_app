@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:provider/provider.dart';
-import 'package:shopping_app/constants.dart';
 import 'package:shopping_app/provider/modalHud.dart';
-import 'package:shopping_app/screens/signup_screen.dart';
+import 'package:shopping_app/screens/login_screen.dart';
 import 'package:shopping_app/services/auth.dart';
 import 'package:shopping_app/widgets/custom_text_field.dart';
 import 'package:shopping_app/widgets/logo.dart';
 
-class LoginScreen extends StatelessWidget {
-  static String id = 'LoginScreen';
+import '../constants.dart';
+
+class SignupScreen extends StatelessWidget {
+  static String id = 'SignupScreen';
+  final GlobalKey<FormState> globalKey = GlobalKey<FormState>();
   String mail, password;
   final auth = Auth();
-  final GlobalKey<FormState> globalKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +29,16 @@ class LoginScreen extends StatelessWidget {
               LogoWidgt(),
               SizedBox(
                 height: height * 0.1,
+              ),
+              CustomTextField(
+                hint: 'Enter your name',
+                icon: Icons.perm_identity,
+                onClick: (value) {
+                  //mail=value;
+                },
+              ),
+              SizedBox(
+                height: height * 0.02,
               ),
               CustomTextField(
                 onClick: (value) {
@@ -62,9 +73,9 @@ class LoginScreen extends StatelessWidget {
                       modalHud.ChangeIsLoading(true);
                       if (globalKey.currentState.validate()) {
                         // do something
+                        globalKey.currentState.save();
                         try {
-                          globalKey.currentState.save();
-                          final result = await auth.SignIn(mail, password);
+                          final authResult = await auth.SignUp(mail, password);
                           modalHud.ChangeIsLoading(false);
                         } catch (e) {
                           modalHud.ChangeIsLoading(false);
@@ -76,10 +87,11 @@ class LoginScreen extends StatelessWidget {
                           );
                         }
                       }
+                      modalHud.ChangeIsLoading(false);
                     },
                     color: Colors.black,
                     child: Text(
-                      'Login',
+                      'Signup',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -92,7 +104,7 @@ class LoginScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Don\'t have an account?',
+                    'Already have an account?',
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                   SizedBox(
@@ -100,10 +112,10 @@ class LoginScreen extends StatelessWidget {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(context, SignupScreen.id);
+                      Navigator.pushNamed(context, LoginScreen.id);
                     },
                     child: Text(
-                      'Signup',
+                      'Login',
                       style: TextStyle(
                         fontSize: 16,
                       ),
