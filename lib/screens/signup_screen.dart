@@ -7,6 +7,7 @@ import 'package:shopping_app/services/auth.dart';
 import 'package:shopping_app/widgets/custom_text_field.dart';
 import 'package:shopping_app/widgets/logo.dart';
 
+
 import '../constants.dart';
 
 class SignupScreen extends StatelessWidget {

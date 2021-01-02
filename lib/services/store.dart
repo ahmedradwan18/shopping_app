@@ -5,7 +5,6 @@ import 'package:shopping_app/models/product.dart';
 import '../constants.dart';
 
 class Store {
-
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   addProduct(Product product) {
@@ -18,13 +17,7 @@ class Store {
     });
   }
 
-  Future<List<Product>> loudProducts() async {
-    var snapshot = await _firestore.collection(kProductsCollection).get();
-    List<Product> products = [];
-    for (var doc in snapshot.docs) {
-      var data = doc.data;
-      // products.add(Product());
-    }
-    return products;
+  Stream<QuerySnapshot> loadProducts() {
+    return _firestore.collection(kProductsCollection).snapshots();
   }
 }
