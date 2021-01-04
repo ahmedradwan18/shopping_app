@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../constants.dart';
 import 'addProduct.dart';
-import 'editProduct.dart';
+import 'manageProducts.dart';
 
 class AdminHome extends StatelessWidget {
   static String id = 'AdminHomeScreen';
@@ -25,7 +25,7 @@ class AdminHome extends StatelessWidget {
           ),
           RaisedButton(
             onPressed: () {
-              Navigator.pushNamed(context, EditProduct.id);
+              Navigator.pushNamed(context, ManageProducts.id);
 
             },
             child: Text('Edit Product'),

@@ -1,94 +1,103 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shopping_app/constants.dart';
 import 'package:shopping_app/models/product.dart';
 import 'package:shopping_app/services/store.dart';
+import 'package:shopping_app/widgets/custom_text_field.dart';
 
-class EditProduct extends StatefulWidget {
+class EditProduct extends StatelessWidget {
   static String id = 'EditProductScreen';
-
-  @override
-  _EditProductState createState() => _EditProductState();
-}
-
-class _EditProductState extends State<EditProduct> {
-  final store = Store();
+  final _store = Store();
+  String _name, _price, _description, _category, _imageLocation;
+  final GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    Product product = ModalRoute
+        .of(context)
+        .settings
+        .arguments;
     return Scaffold(
-      body: StreamBuilder<QuerySnapshot>(
-          stream: store.loadProducts(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              List<Product> products = [];
-              for (var doc in snapshot.data.docs) {
-                var data = doc.data();
-                products.add(Product(
-                    pPrice: data[kProductPrice],
-                    pName: data[kProductName],
-                    pDescription: data[kProductDescription],
-                    pLocation: data[kProductLocation],
-                    pCategory: data[kProductCategory]));
-              }
-              return GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, childAspectRatio: .8),
-                itemBuilder: (context, index) => Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  child: GestureDetector(
-                    onTapUp: (details){
-                      double dx=details.globalPosition.dx;
-                      double dy=details.globalPosition.dy;
-                      double dx2=MediaQuery.of(context).size.width-dx;
-                      double dy2=MediaQuery.of(context).size.width-dy;
-                      showMenu(context: context, position: RelativeRect.fromLTRB(dx, dy, dx2, dy2 ), items: [
-                        PopupMenuItem(child: Text('Edit'),),
-                        PopupMenuItem(child: Text('Delete'),),
-                      ]);
-                    },
-                    child: Stack(
-                      children: [
-                        Positioned.fill(
-                            child: Image(
-                          image: AssetImage(products[index].pLocation),
-                          fit: BoxFit.fill,
-                        )),
-                        Positioned(
-                          bottom: 0,
-                          child: Opacity(
-                            opacity: .6,
-                            child: Container(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 10,vertical: 5),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      products[index].pName,
-                                      style: TextStyle(fontWeight: FontWeight.bold),
-                                    ),
-                                    Text('\$ ${products[index].pPrice}')
-                                  ],
-                                ),
-                              ),
-                              height: 60,
-                              width: MediaQuery.of(context).size.width,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+      body: Form(
+        key: _globalKey,
+        child: ListView(
+          children: [
+            SizedBox(height: MediaQuery.of(context).size.height*0.2,),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // ignore: missing_required_param
+                CustomTextField(
+                  hint: 'Product Name',
+                  onClick: (value) {
+                    _name = value;
+                  },
                 ),
-                itemCount: products.length,
-              );
-            } else {
-              return Center(child: Text("loading...."));
-            }
-          }),
+                SizedBox(
+                  height: 10,
+                ),
+                // ignore: missing_required_param
+                CustomTextField(
+                  hint: 'Product Price',
+                  onClick: (value) {
+                    _price = value;
+                  },
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                // ignore: missing_required_param
+                CustomTextField(
+                  hint: 'Product Description',
+                  onClick: (value) {
+                    _description = value;
+                  },
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                // ignore: missing_required_param
+                CustomTextField(
+                  hint: 'Product Category',
+                  onClick: (value) {
+                    _category = value;
+                  },
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                // ignore: missing_required_param
+                CustomTextField(
+                  hint: 'Product Location',
+                  onClick: (value) {
+                    _imageLocation = value;
+                  },
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                RaisedButton(
+                  onPressed: () {
+                    if (_globalKey != null) {
+
+                    }
+                    if (_globalKey.currentState.validate()) {
+                      _globalKey.currentState.save();
+                      _store.editProduct(({
+                        kProductName:_name,
+                        kProductLocation:_imageLocation,
+                        kProductCategory:_category,
+                        kProductDescription:_description,
+                        kProductPrice:_price  ,
+                      }), product.pId);
+                    }
+                  },
+                  child: Text('Edit Product'),
+                )
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -154,7 +154,7 @@ class LoginScreen extends StatelessWidget {
       if (Provider.of<AdminMode>(context,listen: false).isAdmin) {
         if (password == adminPassword) {
           try {
-            await auth.SignIn(mail, password);
+            await auth.SignIn(mail.trim(), password.trim());
             modalHud.ChangeIsLoading(false);
             Navigator.pushNamed(context, AdminHome.id);
           } catch (e) {

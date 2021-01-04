@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shopping_app/admin/editProduct.dart';
 import 'package:shopping_app/provider/adminMode.dart';
+import 'package:shopping_app/provider/cartItem.dart';
 import 'package:shopping_app/provider/modalHud.dart';
+import 'package:shopping_app/screens/cart_screen.dart';
 import 'package:shopping_app/screens/home_screen.dart';
 import 'package:shopping_app/screens/login_screen.dart';
+import 'package:shopping_app/screens/productInfo_screen.dart';
 import 'package:shopping_app/screens/signup_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'admin/addProduct.dart';
 import 'admin/adminHome_screen.dart';
-import 'admin/editProduct.dart';
+import 'admin/manageProducts.dart';
 
 
 void main() async {
@@ -28,6 +32,8 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider<AdminMode>(
           create: (context) => AdminMode(),
+        ),ChangeNotifierProvider<CartItem>(
+          create: (context) => CartItem(),
         )
       ],
       child: MaterialApp(
@@ -38,7 +44,10 @@ class MyApp extends StatelessWidget {
           HomeScreen.id: (context) => HomeScreen(),
           AdminHome.id: (context) => AdminHome(),
           AddProduct.id: (context) => AddProduct(),
+          ManageProducts.id: (context) => ManageProducts(),
           EditProduct.id: (context) => EditProduct(),
+          ProductInfo.id: (context) => ProductInfo(),
+          CartScreen.id: (context) => CartScreen(),
         },
       ),
     );

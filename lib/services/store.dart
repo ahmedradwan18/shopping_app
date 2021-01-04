@@ -14,10 +14,21 @@ class Store {
       kProductLocation: product.pLocation,
       kProductCategory: product.pCategory,
       kProductPrice: product.pPrice
+
     });
   }
 
   Stream<QuerySnapshot> loadProducts() {
     return _firestore.collection(kProductsCollection).snapshots();
   }
+
+  deleteProduct(documentId){
+    _firestore.collection(kProductsCollection).doc(documentId).delete();
+  }
+  editProduct(data,documentId){
+    _firestore.collection(kProductsCollection).doc(documentId).update(data);
+  }
+
+
+
 }

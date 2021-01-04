@@ -76,7 +76,7 @@ class SignupScreen extends StatelessWidget {
                         // do something
                         globalKey.currentState.save();
                         try {
-                          final authResult = await auth.SignUp(mail, password);
+                          final authResult = await auth.SignUp(mail.trim(), password.trim());
                           modalHud.ChangeIsLoading(false);
                         } catch (e) {
                           modalHud.ChangeIsLoading(false);
