@@ -6,19 +6,32 @@ import 'package:shopping_app/constants.dart';
 import 'package:shopping_app/provider/adminMode.dart';
 import 'package:shopping_app/provider/modalHud.dart';
 import 'package:shopping_app/screens/signup_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shopping_app/services/auth.dart';
 import 'package:shopping_app/widgets/custom_text_field.dart';
 import 'package:shopping_app/widgets/logo.dart';
 
 import 'home_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   static String id = 'LoginScreen';
+
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
    String mail, password;
+
   final auth = Auth();
+
   final GlobalKey<FormState> globalKey = GlobalKey<FormState>();
+
   bool isAdmin = false;
+
   final adminPassword = 'admin1234';
+
+bool keepMeLoggedIn=false;
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +55,7 @@ class LoginScreen extends StatelessWidget {
                 hint: 'Enter Your email',
                 icon: Icons.email,
               ),
-              SizedBox(
-                height: height * 0.02,
-              ),
+              SizedBox(height: 10,),
               CustomTextField(
                 onClick: (value) {
                   password = value;
@@ -52,6 +63,25 @@ class LoginScreen extends StatelessWidget {
                 hint: 'Enter Your password',
                 icon: Icons.lock,
               ),
+              Padding(
+                padding: EdgeInsets.only(left: 25),
+                child: Row(
+                  children: [
+                    Checkbox(
+                        checkColor: kSecondaryColor,
+                        activeColor: kMainColor,
+                        value: keepMeLoggedIn, onChanged: (value){
+                      setState(() {
+                        keepMeLoggedIn=value;
+
+                      });
+
+                    }),
+                    Text('Remember Me')
+                  ],
+                ),
+              ),
+
               SizedBox(
                 height: height * 0.05,
               ),
@@ -63,6 +93,9 @@ class LoginScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     onPressed: ()  {
+                      if(keepMeLoggedIn==true){
+                        keepUserLoggedIn();
+                      }
                       _validate(context);
                     },
                     color: Colors.black,
@@ -187,5 +220,11 @@ class LoginScreen extends StatelessWidget {
       }
     }
     modalHud.ChangeIsLoading(false);
+  }
+
+  void keepUserLoggedIn() async{
+    SharedPreferences preferences=await SharedPreferences.getInstance();
+  preferences.setBool(kKeepMeLoggedIn, keepMeLoggedIn);
+
   }
 }

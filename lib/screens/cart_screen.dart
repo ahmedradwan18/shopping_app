@@ -4,6 +4,7 @@ import 'package:shopping_app/constants.dart';
 import 'package:shopping_app/models/product.dart';
 import 'package:shopping_app/provider/cartItem.dart';
 import 'package:shopping_app/screens/productInfo_screen.dart';
+import 'package:shopping_app/services/store.dart';
 import 'package:shopping_app/widgets/custom_menu.dart';
 
 class CartScreen extends StatefulWidget {
@@ -19,9 +20,10 @@ class _CartScreenState extends State<CartScreen> {
     List<Product> products = Provider.of<CartItem>(context).products;
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
-final double appBarHeight=AppBar().preferredSize.height;
-final double statusBarHeight=MediaQuery.of(context).padding.top;
+    final double appBarHeight = AppBar().preferredSize.height;
+    final double statusBarHeight = MediaQuery.of(context).padding.top;
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -38,13 +40,17 @@ final double statusBarHeight=MediaQuery.of(context).padding.top;
           LayoutBuilder(builder: (context, constraint) {
             if (products.isNotEmpty) {
               return Container(
-                height: screenHeight-statusBarHeight-appBarHeight-(screenHeight*0.08),
+                height: screenHeight -
+                    statusBarHeight -
+                    appBarHeight -
+                    (screenHeight * 0.08),
                 child: ListView.builder(
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: EdgeInsets.all(15),
                       child: GestureDetector(
-                        onTapUp:(details)=> showCustomMenu(details,context,products[index]),
+                        onTapUp: (details) =>
+                            showCustomMenu(details, context, products[index]),
                         child: Container(
                           child: Row(
                             children: [
@@ -103,30 +109,36 @@ final double statusBarHeight=MediaQuery.of(context).padding.top;
                   itemCount: products.length,
                 ),
               );
-            }else{
-              return Container
-                (
-                height: screenHeight-(screenHeight*0.08)-appBarHeight-statusBarHeight,
+            } else {
+              return Container(
+                height: screenHeight -
+                    (screenHeight * 0.08) -
+                    appBarHeight -
+                    statusBarHeight,
                 child: Center(
                   child: Text('Cart Is Empty..'),
                 ),
               );
             }
           }),
-          ButtonTheme(
-            minWidth: screenWidth,
-            height: screenHeight * 0.08,
-            child: RaisedButton(
-              onPressed: () {},
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(10),
-                    topRight: Radius.circular(10)),
+          Builder(
+            builder: (context) => ButtonTheme(
+              minWidth: screenWidth,
+              height: screenHeight * 0.08,
+              child: RaisedButton(
+                onPressed: () {
+                  showCustomDialog(products, context);
+                },
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      topRight: Radius.circular(10)),
+                ),
+                child: Text(
+                  'order'.toUpperCase(),
+                ),
+                color: kMainColor,
               ),
-              child: Text(
-                'order'.toUpperCase(),
-              ),
-              color: kMainColor,
             ),
           )
         ],
@@ -134,7 +146,7 @@ final double statusBarHeight=MediaQuery.of(context).padding.top;
     );
   }
 
-  void showCustomMenu(details,context,product) async{
+  void showCustomMenu(details, context, product) async {
     double dx = details.globalPosition.dx;
     double dy = details.globalPosition.dy;
     double dx2 = MediaQuery.of(context).size.width - dx;
@@ -142,22 +154,71 @@ final double statusBarHeight=MediaQuery.of(context).padding.top;
     await showMenu(
         context: context,
         position: RelativeRect.fromLTRB(dx, dy, dx2, dy2),
-    items: [
-    myPopupMenuItem(
-    onClick: () {
-Navigator.pop(context);
-Provider.of<CartItem>(context,listen: false).deleteProduct(product);
-Navigator.pushNamed(context, ProductInfo.id,arguments: product);
-    },
-    child: Text('Edit'),
-    ),
-    myPopupMenuItem(
-    onClick: () {
-      Navigator.pop(context);
-      Provider.of<CartItem>(context,listen: false).deleteProduct(product);
-    },
-    child: Text('Delete'),
-    ),
-    ]);
+        items: [
+          myPopupMenuItem(
+            onClick: () {
+              Navigator.pop(context);
+              Provider.of<CartItem>(context, listen: false)
+                  .deleteProduct(product);
+              Navigator.pushNamed(context, ProductInfo.id, arguments: product);
+            },
+            child: Text('Edit'),
+          ),
+          myPopupMenuItem(
+            onClick: () {
+              Navigator.pop(context);
+              Provider.of<CartItem>(context, listen: false)
+                  .deleteProduct(product);
+            },
+            child: Text('Delete'),
+          ),
+        ]);
+  }
+
+  void showCustomDialog(List<Product> products, context) async {
+    var price = getTotalPrice(products);
+    var address;
+    AlertDialog alertDialog = AlertDialog(
+      actions: <Widget>[
+        MaterialButton(
+          onPressed: () {
+            try {
+              Store _store = Store();
+              _store.storeOrders(
+                  {kTotalPrice: price, kAddress: address}, products);
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Ordered Successfully..'),
+                ),
+              );
+              Navigator.pop(context);
+            } catch (ex) {
+              print(ex.message);
+            }
+          },
+          child: Text('Confirm'),
+        ),
+      ],
+      content: TextField(
+        onChanged: (value) {
+          address = value;
+        },
+        decoration: InputDecoration(hintText: 'Enter Your Address'),
+      ),
+      title: Text('Total Price = \$ $price'),
+    );
+    await showDialog(
+        context: context,
+        builder: (context) {
+          return alertDialog;
+        });
+  }
+
+  getTotalPrice(List<Product> products) {
+    var price = 0;
+    for (var product in products) {
+      price += product.pQuantity * int.parse(product.pPrice);
+    }
+    return price;
   }
 }

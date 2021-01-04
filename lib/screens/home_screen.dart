@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shopping_app/constants.dart';
 import 'package:shopping_app/models/product.dart';
 import 'package:shopping_app/screens/cart_screen.dart';
+import 'package:shopping_app/screens/login_screen.dart';
 import 'package:shopping_app/screens/productInfo_screen.dart';
 import 'package:shopping_app/services/auth.dart';
 import 'package:shopping_app/services/store.dart';
@@ -36,28 +38,31 @@ class _HomeScreenState extends State<HomeScreen> {
             bottomNavigationBar: BottomNavigationBar(
               currentIndex: bottomBarIndex,
               type: BottomNavigationBarType.fixed,
-              onTap: (value) {
+              onTap: (value)async {
+                if(value==2){
+                  SharedPreferences pref= await SharedPreferences.getInstance();
+                  pref.clear();
+                  await _auth.signOut();
+                  Navigator.popAndPushNamed(context,LoginScreen.id);
+                }
                 setState(() {
                   bottomBarIndex = value;
                 });
               },
               fixedColor: kMainColor,
               items: [
+
                 BottomNavigationBarItem(
-                  label: 'test',
+                  label: 'Home',
+                  icon: Icon(Icons.home),
+                ),
+                BottomNavigationBarItem(
+                  label: 'Profile',
                   icon: Icon(Icons.person),
                 ),
                 BottomNavigationBarItem(
-                  label: 'test',
-                  icon: Icon(Icons.person),
-                ),
-                BottomNavigationBarItem(
-                  label: 'test',
-                  icon: Icon(Icons.person),
-                ),
-                BottomNavigationBarItem(
-                  label: 'test',
-                  icon: Icon(Icons.person),
+                  label: 'Logout',
+                  icon: Icon(Icons.logout),
                 ),
               ],
             ),

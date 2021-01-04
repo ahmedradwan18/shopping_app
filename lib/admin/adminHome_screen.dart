@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shopping_app/admin/ViewOrders.dart';
 import '../constants.dart';
 import 'addProduct.dart';
 import 'manageProducts.dart';
@@ -31,7 +32,10 @@ class AdminHome extends StatelessWidget {
             child: Text('Edit Product'),
           ),
           RaisedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(context, ViewOrdersScreen.id);
+
+            },
             child: Text('View Orders'),
           ),
         ],
